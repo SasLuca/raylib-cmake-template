@@ -4,7 +4,7 @@
 #define SCREEN_HEIGHT (450)
 
 // Change this depending on the path of your executable relative to the assets folder
-#define ASSET_PATH "../assets/"
+#define ASSET_PATH "assets/"
 
 int main(void)
 {
