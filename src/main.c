@@ -3,13 +3,16 @@
 #define SCREEN_WIDTH (800)
 #define SCREEN_HEIGHT (450)
 
+// Change this depending on the path of your executable relative to the assets folder
+#define ASSET_PATH "../assets/"
+
 int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Window title");
 
-    Texture2D texture = LoadTexture("../assets/test.png");
+    Texture2D texture = LoadTexture(ASSET_PATH"test.png");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 

@@ -4,3 +4,5 @@
 cmake-build-debug/
 bin/
 build/
+out/
+CMakeSettings.json
