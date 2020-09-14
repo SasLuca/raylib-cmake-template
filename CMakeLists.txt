@@ -9,5 +9,6 @@ set(BUILD_GAMES    OFF CACHE BOOL "" FORCE) # or games
 
 add_subdirectory(libs/raylib)
 
-add_executable(raylib_template src/main.c)
-target_link_libraries(raylib_template PRIVATE raylib)
+add_executable(${CMAKE_PROJECT_NAME} src/main.c)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE raylib)
+target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC ASSET_PATH="${CMAKE_CURRENT_SOURCE_DIR}/assets/")
