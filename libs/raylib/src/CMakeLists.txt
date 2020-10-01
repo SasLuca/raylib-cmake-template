@@ -3,8 +3,8 @@ project(raylib C)
 include(GNUInstallDirs)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
-set(PROJECT_VERSION 2.5.0)
-set(API_VERSION 251)
+set(PROJECT_VERSION 3.0.0)
+set(API_VERSION 301)
 
 include("CMakeOptions.txt")
 include(BuildType)
@@ -263,6 +263,11 @@ file(COPY "raymath.h" DESTINATION ".")
 file(COPY "raudio.h" DESTINATION ".")
 
 # Print the flags for the user
+if (DEFINED CMAKE_BUILD_TYPE)
+  message(STATUS "Generated build type: ${CMAKE_BUILD_TYPE}")
+else()
+  message(STATUS "Generated config types: ${CMAKE_CONFIGURATION_TYPES}")
+endif()
 message(STATUS "Compiling with the flags:")
 message(STATUS "  PLATFORM=" ${PLATFORM_CPP})
 message(STATUS "  GRAPHICS=" ${GRAPHICS})

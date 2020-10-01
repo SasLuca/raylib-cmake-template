@@ -3,29 +3,20 @@
 #define SCREEN_WIDTH (800)
 #define SCREEN_HEIGHT (450)
 
-// Change this depending on the path of your executable relative to the assets folder
-#define ASSET_PATH "assets/"
+// This is set in the cmake file by default, if you don't use cmake you can set this macro to the path to your asset folder
+#ifndef ASSETS_PATH
+#define ASSETS_PATH "assets/"
+#endif
 
 int main(void)
 {
-    // Initialization
-    //--------------------------------------------------------------------------------------
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Window title");
+    SetTargetFPS(60);
 
-    Texture2D texture = LoadTexture(ASSET_PATH"test.png");
+    Texture2D texture = LoadTexture(ASSETS_PATH"test.png");
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    while (!WindowShouldClose())
     {
-        // Update
-        //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
-        //----------------------------------------------------------------------------------
-
-        // Draw
-        //----------------------------------------------------------------------------------
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
@@ -39,12 +30,9 @@ int main(void)
         DrawText(text, SCREEN_WIDTH / 2 - text_size.x / 2, texture_y + texture.height + text_size.y + 10, 20, BLACK);
 
         EndDrawing();
-        //----------------------------------------------------------------------------------
     }
 
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    CloseWindow();        // Close window and OpenGL context
+    CloseWindow();
 
     return 0;
 }

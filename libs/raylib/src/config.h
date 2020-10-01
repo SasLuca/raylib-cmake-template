@@ -25,7 +25,7 @@
 *
 **********************************************************************************************/
 
-#define RAYLIB_VERSION  "2.6-dev"
+#define RAYLIB_VERSION  "3.0"
 
 // Edit to control what features Makefile'd raylib is compiled with
 #if defined(RAYLIB_CMAKE)
@@ -49,24 +49,25 @@
 // Use busy wait loop for timing sync, if not defined, a high-resolution timer is setup and used
 //#define SUPPORT_BUSY_WAIT_LOOP      1
 // Use a half-busy wait loop, in this case frame sleeps for some time and runs a busy-wait-loop at the end
-//#define SUPPORT_HALFBUSY_WAIT_LOOP
+#define SUPPORT_HALFBUSY_WAIT_LOOP
 // Wait for events passively (sleeping while no events) instead of polling them actively every frame
 //#define SUPPORT_EVENTS_WAITING      1
 // Allow automatic screen capture of current screen pressing F12, defined in KeyCallback()
 #define SUPPORT_SCREEN_CAPTURE      1
 // Allow automatic gif recording of current screen pressing CTRL+F12, defined in KeyCallback()
-#define SUPPORT_GIF_RECORDING       1
+//#define SUPPORT_GIF_RECORDING       1
 // Allow scale all the drawn content to match the high-DPI equivalent size (only PLATFORM_DESKTOP)
 //#define SUPPORT_HIGH_DPI            1
 // Support CompressData() and DecompressData() functions
-#define SUPPORT_COMPRESSION_API     1
+#define SUPPORT_COMPRESSION_API       1
+// Support saving binary data automatically to a generated storage.data file. This file is managed internally.
+#define SUPPORT_DATA_STORAGE          1
 
 //------------------------------------------------------------------------------------
 // Module: rlgl - Configuration Flags
 //------------------------------------------------------------------------------------
 // Support VR simulation functionality (stereo rendering)
 #define SUPPORT_VR_SIMULATOR        1
-
 
 //------------------------------------------------------------------------------------
 // Module: shapes - Configuration Flags
@@ -83,15 +84,15 @@
 //------------------------------------------------------------------------------------
 // Selecte desired fileformats to be supported for image data loading
 #define SUPPORT_FILEFORMAT_PNG      1
-//#define SUPPORT_FILEFORMAT_BMP    1
-//#define SUPPORT_FILEFORMAT_TGA    1
+#define SUPPORT_FILEFORMAT_BMP      1
+#define SUPPORT_FILEFORMAT_TGA      1
 //#define SUPPORT_FILEFORMAT_JPG    1
-#define SUPPORT_FILEFORMAT_GIF    1
+#define SUPPORT_FILEFORMAT_GIF      1
 //#define SUPPORT_FILEFORMAT_PSD    1
-#define SUPPORT_FILEFORMAT_DDS    1
+#define SUPPORT_FILEFORMAT_DDS      1
 #define SUPPORT_FILEFORMAT_HDR      1
-//#define SUPPORT_FILEFORMAT_KTX    1
-//#define SUPPORT_FILEFORMAT_ASTC   1
+#define SUPPORT_FILEFORMAT_KTX      1
+#define SUPPORT_FILEFORMAT_ASTC     1
 //#define SUPPORT_FILEFORMAT_PKM    1
 //#define SUPPORT_FILEFORMAT_PVR    1
 
@@ -103,7 +104,6 @@
 // Support procedural image generation functionality (gradient, spot, perlin-noise, cellular)
 #define SUPPORT_IMAGE_GENERATION    1
 
-
 //------------------------------------------------------------------------------------
 // Module: text - Configuration Flags
 //------------------------------------------------------------------------------------
@@ -113,7 +113,6 @@
 // Selected desired font fileformats to be supported for loading
 #define SUPPORT_FILEFORMAT_FNT      1
 #define SUPPORT_FILEFORMAT_TTF      1
-
 
 //------------------------------------------------------------------------------------
 // Module: models - Configuration Flags
@@ -127,7 +126,6 @@
 // NOTE: Some generated meshes DO NOT include generated texture coordinates
 #define SUPPORT_MESH_GENERATION     1
 
-
 //------------------------------------------------------------------------------------
 // Module: audio - Configuration Flags
 //------------------------------------------------------------------------------------
@@ -136,16 +134,15 @@
 #define SUPPORT_FILEFORMAT_OGG      1
 #define SUPPORT_FILEFORMAT_XM       1
 #define SUPPORT_FILEFORMAT_MOD      1
-#define SUPPORT_FILEFORMAT_FLAC     1
+//#define SUPPORT_FILEFORMAT_FLAC     1
 #define SUPPORT_FILEFORMAT_MP3      1
-
 
 //------------------------------------------------------------------------------------
 // Module: utils - Configuration Flags
 //------------------------------------------------------------------------------------
-// Show TraceLog() output messages
+// Show TRACELOG() output messages
 // NOTE: By default LOG_DEBUG traces not shown
-#define SUPPORT_TRACELOG    1
-
+#define SUPPORT_TRACELOG            1
+//#define SUPPORT_TRACELOG_DEBUG      1
 
 #endif  //defined(RAYLIB_CMAKE)

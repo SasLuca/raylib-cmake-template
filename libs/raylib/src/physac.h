@@ -73,11 +73,6 @@
 #if !defined(PHYSAC_H)
 #define PHYSAC_H
 
-// #define PHYSAC_STATIC
-// #define  PHYSAC_NO_THREADS
-// #define  PHYSAC_STANDALONE
-// #define  PHYSAC_DEBUG
-
 #if defined(PHYSAC_STATIC)
     #define PHYSACDEF static            // Functions just visible to module including this file
 #else
@@ -88,103 +83,52 @@
     #endif
 #endif
 
+// Allow custom memory allocators
+#ifndef PHYSAC_MALLOC
+    #define PHYSAC_MALLOC(size)         malloc(size)
+#endif
+#ifndef PHYSAC_FREE
+    #define PHYSAC_FREE(ptr)            free(ptr)
+#endif
+
 //----------------------------------------------------------------------------------
 // Defines and Macros
 //----------------------------------------------------------------------------------
-#define     PHYSAC_MAX_BODIES               64
-#define     PHYSAC_MAX_MANIFOLDS            4096
-#define     PHYSAC_MAX_VERTICES             24
-#define     PHYSAC_CIRCLE_VERTICES          24
+#define PHYSAC_MAX_BODIES               64
+#define PHYSAC_MAX_MANIFOLDS            4096
+#define PHYSAC_MAX_VERTICES             24
+#define PHYSAC_CIRCLE_VERTICES          24
 
-#define     PHYSAC_COLLISION_ITERATIONS     100
-#define     PHYSAC_PENETRATION_ALLOWANCE    0.05f
-#define     PHYSAC_PENETRATION_CORRECTION   0.4f
+#define PHYSAC_COLLISION_ITERATIONS     100
+#define PHYSAC_PENETRATION_ALLOWANCE    0.05f
+#define PHYSAC_PENETRATION_CORRECTION   0.4f
 
-#define     PHYSAC_PI                       3.14159265358979323846
-#define     PHYSAC_DEG2RAD                  (PHYSAC_PI/180.0f)
-
-#define     PHYSAC_MALLOC(size)             malloc(size)
-#define     PHYSAC_FREE(ptr)                free(ptr)
+#define PHYSAC_PI                       3.14159265358979323846
+#define PHYSAC_DEG2RAD                  (PHYSAC_PI/180.0f)
 
 //----------------------------------------------------------------------------------
 // Types and Structures Definition
 // NOTE: Below types are required for PHYSAC_STANDALONE usage
 //----------------------------------------------------------------------------------
 #if defined(PHYSAC_STANDALONE)
+    // Boolean type
+    #if defined(__STDC__) && __STDC_VERSION__ >= 199901L
+        #include <stdbool.h>
+    #elif !defined(__cplusplus) && !defined(bool)
+        typedef enum { false, true } bool;
+    #endif
+
     // Vector2 type
     typedef struct Vector2 {
         float x;
         float y;
     } Vector2;
-
-    // Boolean type
-    #if !defined(_STDBOOL_H)
-        typedef enum { false, true } bool;
-        #define _STDBOOL_H
-    #endif
 #endif
 
 typedef enum PhysicsShapeType { PHYSICS_CIRCLE, PHYSICS_POLYGON } PhysicsShapeType;
 
 // Previously defined to be used in PhysicsShape struct as circular dependencies
 typedef struct PhysicsBodyData *PhysicsBody;
-
-// Mat2 type (used for polygon shape rotation matrix)
-typedef struct Mat2 {
-    float m00;
-    float m01;
-    float m10;
-    float m11;
-} Mat2;
-
-typedef struct PolygonData {
-    unsigned int vertexCount;                   // Current used vertex and normals count
-    Vector2 positions[PHYSAC_MAX_VERTICES];     // Polygon vertex positions vectors
-    Vector2 normals[PHYSAC_MAX_VERTICES];       // Polygon vertex normals vectors
-} PolygonData;
-
-typedef struct PhysicsShape {
-    PhysicsShapeType type;                      // Physics shape type (circle or polygon)
-    PhysicsBody body;                           // Shape physics body reference
-    float radius;                               // Circle shape radius (used for circle shapes)
-    Mat2 transform;                             // Vertices transform matrix 2x2
-    PolygonData vertexData;                     // Polygon shape vertices position and normals data (just used for polygon shapes)
-} PhysicsShape;
-
-typedef struct PhysicsBodyData {
-    unsigned int id;                            // Reference unique identifier
-    bool enabled;                               // Enabled dynamics state (collisions are calculated anyway)
-    Vector2 position;                           // Physics body shape pivot
-    Vector2 velocity;                           // Current linear velocity applied to position
-    Vector2 force;                              // Current linear force (reset to 0 every step)
-    float angularVelocity;                      // Current angular velocity applied to orient
-    float torque;                               // Current angular force (reset to 0 every step)
-    float orient;                               // Rotation in radians
-    float inertia;                              // Moment of inertia
-    float inverseInertia;                       // Inverse value of inertia
-    float mass;                                 // Physics body mass
-    float inverseMass;                          // Inverse value of mass
-    float staticFriction;                       // Friction when the body has not movement (0 to 1)
-    float dynamicFriction;                      // Friction when the body has movement (0 to 1)
-    float restitution;                          // Restitution coefficient of the body (0 to 1)
-    bool useGravity;                            // Apply gravity force to dynamics
-    bool isGrounded;                            // Physics grounded on other body state
-    bool freezeOrient;                          // Physics rotation constraint
-    PhysicsShape shape;                         // Physics body shape information (type, radius, vertices, normals)
-} PhysicsBodyData;
-
-typedef struct PhysicsManifoldData {
-    unsigned int id;                            // Reference unique identifier
-    PhysicsBody bodyA;                          // Manifold first physics body reference
-    PhysicsBody bodyB;                          // Manifold second physics body reference
-    float penetration;                          // Depth of penetration from collision
-    Vector2 normal;                             // Normal direction vector from 'a' to 'b'
-    Vector2 contacts[2];                        // Points of contact during collision
-    unsigned int contactsCount;                 // Current collision number of contacts
-    float restitution;                          // Mixed restitution during collision
-    float dynamicFriction;                      // Mixed dynamic friction during collision
-    float staticFriction;                       // Mixed static friction during collision
-} PhysicsManifoldData, *PhysicsManifold;
 
 #if defined(__cplusplus)
 extern "C" {                                    // Prevents name mangling of functions
@@ -233,12 +177,19 @@ PHYSACDEF void ClosePhysics(void);                                              
 #endif
 
 #if defined(PHYSAC_DEBUG)
+
+#endif
+
+// Support TRACELOG macros
+#if defined(PHYSAC_DEBUG)
     #include <stdio.h>              // Required for: printf()
+    #define TRACELOG(...) printf(__VA_ARGS__)
+#else
+    #define TRACELOG(...) (void)0
 #endif
 
 #include <stdlib.h>                 // Required for: malloc(), free(), srand(), rand()
 #include <math.h>                   // Required for: cosf(), sinf(), fabs(), sqrtf()
-#include <stdint.h>                 // Required for: uint64_t
 
 #if !defined(PHYSAC_STANDALONE)
     #include "raymath.h"            // Required for: Vector2Add(), Vector2Subtract()
@@ -263,12 +214,73 @@ PHYSACDEF void ClosePhysics(void);                                              
 //----------------------------------------------------------------------------------
 // Defines and Macros
 //----------------------------------------------------------------------------------
-#define     min(a,b)                    (((a)<(b))?(a):(b))
-#define     max(a,b)                    (((a)>(b))?(a):(b))
-#define     PHYSAC_FLT_MAX              3.402823466e+38f
-#define     PHYSAC_EPSILON              0.000001f
-#define     PHYSAC_K                    1.0f/3.0f
-#define     PHYSAC_VECTOR_ZERO          (Vector2){ 0.0f, 0.0f }
+#define min(a,b)            (((a)<(b))?(a):(b))
+#define max(a,b)            (((a)>(b))?(a):(b))
+#define PHYSAC_FLT_MAX      3.402823466e+38f
+#define PHYSAC_EPSILON      0.000001f
+#define PHYSAC_K            1.0f/3.0f
+#define PHYSAC_VECTOR_ZERO  (Vector2){ 0.0f, 0.0f }
+
+//----------------------------------------------------------------------------------
+// Data Types Structure Definition
+//----------------------------------------------------------------------------------
+
+// Matrix2x2 type (used for polygon shape rotation matrix)
+typedef struct Matrix2x2 {
+    float m00;
+    float m01;
+    float m10;
+    float m11;
+} Matrix2x2;
+
+typedef struct PolygonData {
+    unsigned int vertexCount;                   // Current used vertex and normals count
+    Vector2 positions[PHYSAC_MAX_VERTICES];     // Polygon vertex positions vectors
+    Vector2 normals[PHYSAC_MAX_VERTICES];       // Polygon vertex normals vectors
+} PolygonData;
+
+typedef struct PhysicsShape {
+    PhysicsShapeType type;                      // Physics shape type (circle or polygon)
+    PhysicsBody body;                           // Shape physics body reference
+    float radius;                               // Circle shape radius (used for circle shapes)
+    Matrix2x2 transform;                        // Vertices transform matrix 2x2
+    PolygonData vertexData;                     // Polygon shape vertices position and normals data (just used for polygon shapes)
+} PhysicsShape;
+
+typedef struct PhysicsBodyData {
+    unsigned int id;                            // Reference unique identifier
+    bool enabled;                               // Enabled dynamics state (collisions are calculated anyway)
+    Vector2 position;                           // Physics body shape pivot
+    Vector2 velocity;                           // Current linear velocity applied to position
+    Vector2 force;                              // Current linear force (reset to 0 every step)
+    float angularVelocity;                      // Current angular velocity applied to orient
+    float torque;                               // Current angular force (reset to 0 every step)
+    float orient;                               // Rotation in radians
+    float inertia;                              // Moment of inertia
+    float inverseInertia;                       // Inverse value of inertia
+    float mass;                                 // Physics body mass
+    float inverseMass;                          // Inverse value of mass
+    float staticFriction;                       // Friction when the body has not movement (0 to 1)
+    float dynamicFriction;                      // Friction when the body has movement (0 to 1)
+    float restitution;                          // Restitution coefficient of the body (0 to 1)
+    bool useGravity;                            // Apply gravity force to dynamics
+    bool isGrounded;                            // Physics grounded on other body state
+    bool freezeOrient;                          // Physics rotation constraint
+    PhysicsShape shape;                         // Physics body shape information (type, radius, vertices, normals)
+} PhysicsBodyData;
+
+typedef struct PhysicsManifoldData {
+    unsigned int id;                            // Reference unique identifier
+    PhysicsBody bodyA;                          // Manifold first physics body reference
+    PhysicsBody bodyB;                          // Manifold second physics body reference
+    float penetration;                          // Depth of penetration from collision
+    Vector2 normal;                             // Normal direction vector from 'a' to 'b'
+    Vector2 contacts[2];                        // Points of contact during collision
+    unsigned int contactsCount;                 // Current collision number of contacts
+    float restitution;                          // Mixed restitution during collision
+    float dynamicFriction;                      // Mixed dynamic friction during collision
+    float staticFriction;                       // Mixed static friction during collision
+} PhysicsManifoldData, *PhysicsManifold;
 
 //----------------------------------------------------------------------------------
 // Global Variables Definition
@@ -282,7 +294,7 @@ static double baseTime = 0.0;                               // Offset time for M
 static double startTime = 0.0;                              // Start time in milliseconds
 static double deltaTime = 1.0/60.0/10.0 * 1000;             // Delta time used for physics steps, in milliseconds
 static double currentTime = 0.0;                            // Current time in milliseconds
-static uint64_t frequency = 0;                              // Hi-res clock frequency
+static unsigned long long int frequency = 0;                // Hi-res clock frequency
 
 static double accumulator = 0.0;                            // Physics time step delta time accumulator
 static unsigned int stepsCount = 0;                         // Total physics steps processed
@@ -320,7 +332,7 @@ static bool BiasGreaterThan(float valueA, float valueB);                        
 static Vector2 TriangleBarycenter(Vector2 v1, Vector2 v2, Vector2 v3);                                      // Returns the barycenter of a triangle given by 3 points
 
 static void InitTimer(void);                                                                                // Initializes hi-resolution MONOTONIC timer
-static uint64_t GetTimeCount(void);                                                                         // Get hi-res MONOTONIC time measure in mseconds
+static unsigned long long int GetTimeCount(void);                                                           // Get hi-res MONOTONIC time measure in mseconds
 static double GetCurrentTime(void);                                                                         // Get current time measure in milliseconds
 
 // Math functions
@@ -335,10 +347,10 @@ static Vector2 Vector2Add(Vector2 v1, Vector2 v2);                              
 static Vector2 Vector2Subtract(Vector2 v1, Vector2 v2);                                                     // Returns the subtract of two given vectors
 #endif
 
-static Mat2 Mat2Radians(float radians);                                                                     // Creates a matrix 2x2 from a given radians value
-static void Mat2Set(Mat2 *matrix, float radians);                                                           // Set values from radians to a created matrix 2x2
-static inline Mat2 Mat2Transpose(Mat2 matrix);                                                              // Returns the transpose of a given matrix 2x2
-static inline Vector2 Mat2MultiplyVector2(Mat2 matrix, Vector2 vector);                                     // Multiplies a vector by a matrix 2x2
+static Matrix2x2 Mat2Radians(float radians);                                                                     // Creates a matrix 2x2 from a given radians value
+static void Mat2Set(Matrix2x2 *matrix, float radians);                                                           // Set values from radians to a created matrix 2x2
+static inline Matrix2x2 Mat2Transpose(Matrix2x2 matrix);                                                              // Returns the transpose of a given matrix 2x2
+static inline Vector2 Mat2MultiplyVector2(Matrix2x2 matrix, Vector2 vector);                                     // Multiplies a vector by a matrix 2x2
 
 //----------------------------------------------------------------------------------
 // Module Functions Definition
@@ -356,7 +368,7 @@ PHYSACDEF void InitPhysics(void)
     InitTimer();
 
     #if defined(PHYSAC_DEBUG)
-        printf("[PHYSAC] physics module initialized successfully\n");
+        TRACELOG("[PHYSAC] physics module initialized successfully\n");
     #endif
 
     accumulator = 0.0;
@@ -459,11 +471,11 @@ PHYSACDEF PhysicsBody CreatePhysicsBodyRectangle(Vector2 pos, float width, float
         physicsBodiesCount++;
 
         #if defined(PHYSAC_DEBUG)
-            printf("[PHYSAC] created polygon physics body id %i\n", newBody->id);
+            TRACELOG("[PHYSAC] created polygon physics body id %i\n", newBody->id);
         #endif
     }
     #if defined(PHYSAC_DEBUG)
-        else printf("[PHYSAC] new physics body creation failed because there is any available id to use\n");
+        else TRACELOG("[PHYSAC] new physics body creation failed because there is any available id to use\n");
     #endif
 
     return newBody;
@@ -545,11 +557,11 @@ PHYSACDEF PhysicsBody CreatePhysicsBodyPolygon(Vector2 pos, float radius, int si
         physicsBodiesCount++;
 
         #if defined(PHYSAC_DEBUG)
-            printf("[PHYSAC] created polygon physics body id %i\n", newBody->id);
+            TRACELOG("[PHYSAC] created polygon physics body id %i\n", newBody->id);
         #endif
     }
     #if defined(PHYSAC_DEBUG)
-        else printf("[PHYSAC] new physics body creation failed because there is any available id to use\n");
+        else TRACELOG("[PHYSAC] new physics body creation failed because there is any available id to use\n");
     #endif
 
     return newBody;
@@ -604,8 +616,8 @@ PHYSACDEF void PhysicsShatter(PhysicsBody body, Vector2 position, float force)
             {
                 int count = vertexData.vertexCount;
                 Vector2 bodyPos = body->position;
-                Vector2 *vertices = (Vector2*)malloc(sizeof(Vector2) * count);
-                Mat2 trans = body->shape.transform;
+                Vector2 *vertices = (Vector2 *)PHYSAC_MALLOC(sizeof(Vector2)*count);
+                Matrix2x2 trans = body->shape.transform;
                 for (int i = 0; i < count; i++) vertices[i] = vertexData.positions[i];
 
                 // Destroy shattered physics body
@@ -697,12 +709,12 @@ PHYSACDEF void PhysicsShatter(PhysicsBody body, Vector2 position, float force)
                     PhysicsAddForce(newBody, forceDirection);
                 }
 
-                free(vertices);
+                PHYSAC_FREE(vertices);
             }
         }
     }
     #if defined(PHYSAC_DEBUG)
-        else printf("[PHYSAC] error when trying to shatter a null reference physics body");
+        else TRACELOG("[PHYSAC] error when trying to shatter a null reference physics body");
     #endif
 }
 
@@ -724,12 +736,12 @@ PHYSACDEF PhysicsBody GetPhysicsBody(int index)
         if (body == NULL)
         {
             #if defined(PHYSAC_DEBUG)
-                printf("[PHYSAC] error when trying to get a null reference physics body");
+                TRACELOG("[PHYSAC] error when trying to get a null reference physics body");
             #endif
         }
     }
     #if defined(PHYSAC_DEBUG)
-    else printf("[PHYSAC] physics body index is out of bounds");
+    else TRACELOG("[PHYSAC] physics body index is out of bounds");
     #endif
 
     return body;
@@ -746,11 +758,11 @@ PHYSACDEF int GetPhysicsShapeType(int index)
 
         if (body != NULL) result = body->shape.type;
         #if defined(PHYSAC_DEBUG)
-        else printf("[PHYSAC] error when trying to get a null reference physics body");
+        else TRACELOG("[PHYSAC] error when trying to get a null reference physics body");
         #endif
     }
     #if defined(PHYSAC_DEBUG)
-    else printf("[PHYSAC] physics body index is out of bounds");
+    else TRACELOG("[PHYSAC] physics body index is out of bounds");
     #endif
 
     return result;
@@ -775,11 +787,11 @@ PHYSACDEF int GetPhysicsShapeVerticesCount(int index)
             }
         }
         #if defined(PHYSAC_DEBUG)
-        else printf("[PHYSAC] error when trying to get a null reference physics body");
+        else TRACELOG("[PHYSAC] error when trying to get a null reference physics body");
         #endif
     }
     #if defined(PHYSAC_DEBUG)
-    else printf("[PHYSAC] physics body index is out of bounds");
+    else TRACELOG("[PHYSAC] physics body index is out of bounds");
     #endif
 
     return result;
@@ -808,7 +820,7 @@ PHYSACDEF Vector2 GetPhysicsShapeVertex(PhysicsBody body, int vertex)
         }
     }
     #if defined(PHYSAC_DEBUG)
-    else printf("[PHYSAC] error when trying to get a null reference physics body");
+    else TRACELOG("[PHYSAC] error when trying to get a null reference physics body");
     #endif
 
     return position;
@@ -845,7 +857,7 @@ PHYSACDEF void DestroyPhysicsBody(PhysicsBody body)
         if (index == -1)
         {
         #if defined(PHYSAC_DEBUG)
-            printf("[PHYSAC] Not possible to find body id %i in pointers array\n", id);
+            TRACELOG("[PHYSAC] Not possible to find body id %i in pointers array\n", id);
         #endif
             return;     // Prevent access to index -1
         }
@@ -865,11 +877,11 @@ PHYSACDEF void DestroyPhysicsBody(PhysicsBody body)
         physicsBodiesCount--;
 
         #if defined(PHYSAC_DEBUG)
-            printf("[PHYSAC] destroyed physics body id %i\n", id);
+            TRACELOG("[PHYSAC] destroyed physics body id %i\n", id);
         #endif
     }
     #if defined(PHYSAC_DEBUG)
-        else printf("[PHYSAC] error trying to destroy a null referenced body\n");
+        else TRACELOG("[PHYSAC] error trying to destroy a null referenced body\n");
     #endif
 }
 
@@ -907,7 +919,7 @@ PHYSACDEF void ResetPhysics(void)
     physicsManifoldsCount = 0;
 
     #if defined(PHYSAC_DEBUG)
-        printf("[PHYSAC] physics module reset successfully\n");
+        TRACELOG("[PHYSAC] physics module reset successfully\n");
     #endif
 }
 
@@ -928,9 +940,9 @@ PHYSACDEF void ClosePhysics(void)
     for (int i = physicsBodiesCount - 1; i >= 0; i--) DestroyPhysicsBody(bodies[i]);
 
     #if defined(PHYSAC_DEBUG)
-        if (physicsBodiesCount > 0 || usedMemory != 0) printf("[PHYSAC] physics module closed with %i still allocated bodies [MEMORY: %i bytes]\n", physicsBodiesCount, usedMemory);
-        else if (physicsManifoldsCount > 0 || usedMemory != 0) printf("[PHYSAC] physics module closed with %i still allocated manifolds [MEMORY: %i bytes]\n", physicsManifoldsCount, usedMemory);
-        else printf("[PHYSAC] physics module closed successfully\n");
+        if (physicsBodiesCount > 0 || usedMemory != 0) TRACELOG("[PHYSAC] physics module closed with %i still allocated bodies [MEMORY: %i bytes]\n", physicsBodiesCount, usedMemory);
+        else if (physicsManifoldsCount > 0 || usedMemory != 0) TRACELOG("[PHYSAC] physics module closed with %i still allocated manifolds [MEMORY: %i bytes]\n", physicsManifoldsCount, usedMemory);
+        else TRACELOG("[PHYSAC] physics module closed successfully\n");
     #endif
 }
 
@@ -1020,8 +1032,9 @@ static PolygonData CreateRectanglePolygon(Vector2 pos, Vector2 size)
 // Physics loop thread function
 static void *PhysicsLoop(void *arg)
 {
+#if !defined(PHYSAC_NO_THREADS)
     #if defined(PHYSAC_DEBUG)
-        printf("[PHYSAC] physics thread created successfully\n");
+        TRACELOG("[PHYSAC] physics thread created successfully\n");
     #endif
 
     // Initialize physics loop thread values
@@ -1032,6 +1045,7 @@ static void *PhysicsLoop(void *arg)
     {
         RunPhysicsStep();
     }
+#endif
 
     return NULL;
 }
@@ -1158,7 +1172,7 @@ PHYSACDEF void RunPhysicsStep(void)
     while (accumulator >= deltaTime)
     {
 #ifdef PHYSAC_DEBUG
-        //printf("currentTime %f, startTime %f, accumulator-pre %f, accumulator-post %f, delta %f, deltaTime %f\n",
+        //TRACELOG("currentTime %f, startTime %f, accumulator-pre %f, accumulator-post %f, delta %f, deltaTime %f\n",
         //       currentTime, startTime, accumulator, accumulator-deltaTime, delta, deltaTime);
 #endif
         PhysicsStep();
@@ -1230,7 +1244,7 @@ static PhysicsManifold CreatePhysicsManifold(PhysicsBody a, PhysicsBody b)
         physicsManifoldsCount++;
     }
     #if defined(PHYSAC_DEBUG)
-        else printf("[PHYSAC] new physics manifold creation failed because there is any available id to use\n");
+        else TRACELOG("[PHYSAC] new physics manifold creation failed because there is any available id to use\n");
     #endif
 
     return newManifold;
@@ -1256,10 +1270,10 @@ static void DestroyPhysicsManifold(PhysicsManifold manifold)
         if (index == -1)
         {
         #if defined(PHYSAC_DEBUG)
-            printf("[PHYSAC] Not possible to manifold id %i in pointers array\n", id);
+            TRACELOG("[PHYSAC] Not possible to manifold id %i in pointers array\n", id);
         #endif
             return;     // Prevent access to index -1
-        }      
+        }
 
         // Free manifold allocated memory
         PHYSAC_FREE(manifold);
@@ -1276,7 +1290,7 @@ static void DestroyPhysicsManifold(PhysicsManifold manifold)
         physicsManifoldsCount--;
     }
     #if defined(PHYSAC_DEBUG)
-        else printf("[PHYSAC] error trying to destroy a null referenced manifold\n");
+        else TRACELOG("[PHYSAC] error trying to destroy a null referenced manifold\n");
     #endif
 }
 
@@ -1786,7 +1800,7 @@ static float FindAxisLeastPenetration(int *faceIndex, PhysicsShape shapeA, Physi
         Vector2 transNormal = Mat2MultiplyVector2(shapeA.transform, normal);
 
         // Transform face normal into B shape's model space
-        Mat2 buT = Mat2Transpose(shapeB.transform);
+        Matrix2x2 buT = Mat2Transpose(shapeB.transform);
         normal = Mat2MultiplyVector2(buT, transNormal);
 
         // Retrieve support point from B shape along -n
@@ -1909,7 +1923,7 @@ static void InitTimer(void)
     QueryPerformanceFrequency((unsigned long long int *) &frequency);
 #endif
 
-#if defined(__linux__)
+#if defined(__EMSCRIPTEN__) || defined(__linux__)
     struct timespec now;
     if (clock_gettime(CLOCK_MONOTONIC, &now) == 0) frequency = 1000000000;
 #endif
@@ -1925,9 +1939,9 @@ static void InitTimer(void)
 }
 
 // Get hi-res MONOTONIC time measure in seconds
-static uint64_t GetTimeCount(void)
+static unsigned long long int GetTimeCount(void)
 {
-    uint64_t value = 0;
+    unsigned long long int value = 0;
 
 #if defined(_WIN32)
     QueryPerformanceCounter((unsigned long long int *) &value);
@@ -1936,7 +1950,7 @@ static uint64_t GetTimeCount(void)
 #if defined(__linux__)
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
-    value = (uint64_t)now.tv_sec*(uint64_t)1000000000 + (uint64_t)now.tv_nsec;
+    value = (unsigned long long int)now.tv_sec*(unsigned long long int)1000000000 + (unsigned long long int)now.tv_nsec;
 #endif
 
 #if defined(__APPLE__)
@@ -2014,16 +2028,16 @@ static inline Vector2 Vector2Subtract(Vector2 v1, Vector2 v2)
 #endif
 
 // Creates a matrix 2x2 from a given radians value
-static Mat2 Mat2Radians(float radians)
+static Matrix2x2 Mat2Radians(float radians)
 {
     float c = cosf(radians);
     float s = sinf(radians);
 
-    return (Mat2){ c, -s, s, c };
+    return (Matrix2x2){ c, -s, s, c };
 }
 
 // Set values from radians to a created matrix 2x2
-static void Mat2Set(Mat2 *matrix, float radians)
+static void Mat2Set(Matrix2x2 *matrix, float radians)
 {
     float cos = cosf(radians);
     float sin = sinf(radians);
@@ -2035,13 +2049,13 @@ static void Mat2Set(Mat2 *matrix, float radians)
 }
 
 // Returns the transpose of a given matrix 2x2
-static inline Mat2 Mat2Transpose(Mat2 matrix)
+static inline Matrix2x2 Mat2Transpose(Matrix2x2 matrix)
 {
-    return (Mat2){ matrix.m00, matrix.m10, matrix.m01, matrix.m11 };
+    return (Matrix2x2){ matrix.m00, matrix.m10, matrix.m01, matrix.m11 };
 }
 
 // Multiplies a vector by a matrix 2x2
-static inline Vector2 Mat2MultiplyVector2(Mat2 matrix, Vector2 vector)
+static inline Vector2 Mat2MultiplyVector2(Matrix2x2 matrix, Vector2 vector)
 {
     return (Vector2){ matrix.m00*vector.x + matrix.m01*vector.y, matrix.m10*vector.x + matrix.m11*vector.y };
 }
