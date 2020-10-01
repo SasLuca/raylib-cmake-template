@@ -3,11 +3,6 @@
 #define SCREEN_WIDTH (800)
 #define SCREEN_HEIGHT (450)
 
-// This is set in the cmake file by default, if you don't use cmake you can set this macro to the path to your asset folder
-#ifndef ASSETS_PATH
-#define ASSETS_PATH "assets/"
-#endif
-
 int main(void)
 {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Window title");
