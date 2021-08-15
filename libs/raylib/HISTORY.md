@@ -249,8 +249,76 @@ After **10 months of intense development**, new raylib version is ready. Despite
 
  - New **GitHub Actions CI** system has been implemented for Windows, Linux and macOS code and examples compilation on every new commit or PR to make sure library keeps stable and usable with no breaking bugs.
 
-Note that only key changes are listed here but there is way more! About **30 new functions**, multiple functions reviewed, bindings to [+40 programming languages](https://github.com/raysan5/raylib/blob/master/BINDINGS.md) and great samples/demos/tutorials [created by the community](https://discord.gg/VkzNHUE), including raylib integration with [Spine](https://github.com/WEREMSOFT/spine-raylib-runtimes), [Unity](https://unitycoder.com/blog/2019/12/09/using-raylib-dll-in-unity/), [Tiled](https://github.com/OnACoffeeBreak/raylib_tiled_import_with_tmx), [Nuklear](http://bedroomcoders.co.uk/implementing-a-3d-gui-with-raylib/), [enet](https://github.com/nxrighthere/NetDynamics) and [more](https://github.com/raysan5/raylib/issues/1079)!
+Note that only key changes are listed here but there is way more! About **30 new functions**, multiple functions reviewed, bindings to [+40 programming languages](https://github.com/raysan5/raylib/blob/master/BINDINGS.md) and great samples/demos/tutorials [created by the community](https://discord.gg/raylib), including raylib integration with [Spine](https://github.com/WEREMSOFT/spine-raylib-runtimes), [Unity](https://unitycoder.com/blog/2019/12/09/using-raylib-dll-in-unity/), [Tiled](https://github.com/OnACoffeeBreak/raylib_tiled_import_with_tmx), [Nuklear](http://bedroomcoders.co.uk/implementing-a-3d-gui-with-raylib/), [enet](https://github.com/nxrighthere/NetDynamics) and [more](https://github.com/raysan5/raylib/issues/1079)!
 
 It has been **10 months of improvements** to create the best raylib ever.
 
 Welcome to **raylib 3.0**.
+
+notes on raylib 3.5
+-------------------
+
+It's December 25th... this crazy 2020 is about to finish and finally the holidays gave me some time to put a new version of raylib. It's been **9 months since last release** and last November raylib become 7 years old... I was not able to release this new version back then but here it is. Many changes and improvements have happened in those months and, even, last August, raylib was awarded with an [Epic Megagrant](https://www.unrealengine.com/en-US/blog/epic-megagrants-fall-2020-update)! Bindings list kept growing to [+50 programming languages](BINDINGS.md) and some new platforms have been supported. Let's see this new version details:
+
+First, some general numbers of this new update:
+
+ - **+650** commits since previous RELEASE
+ - **+30** functions ADDED (for a TOTAL of **475**!)
+ - **+90** functions REVIEWED/REDESIGNED
+ - **+30** contributors (for a TOTAL of **170**!)
+ - **+8** new examples (for a TOTAL of **+120**!)
+ 
+Here the list with some highlights for `raylib 3.5`.
+ 
+ - NEW **Platform** supported: **Raspberry Pi 4 native mode** (no X11 windows) through [DRM](https://en.wikipedia.org/wiki/Direct_Rendering_Manager) subsystem and GBM API. Actually this is a really interesting improvement because it opens the door to raylib to support other embedded platforms (Odroid, GameShell, NanoPi...). Also worth mentioning the un-official homebrew ports of raylib for [PS4](https://github.com/orbisdev/orbisdev-orbisGl2) and [PSVita](https://github.com/psp2dev/raylib4Vita).
+ 
+ - NEW **configuration options** exposed: For custom raylib builds, `config.h` now exposes **more than 150 flags and defines** to build raylib with only the desired features, for example, it allows to build a minimal raylib library in just some KB removing all external data filetypes supported, very useful to generate **small executables or embedded devices**.
+ 
+ - NEW **automatic GIF recording** feature: Actually, automatic GIF recording (**CTRL+F12**) for any raylib application has been available for some versions but this feature was really slow and low-performant using an old gif library with many file-accesses. It has been replaced by a **high-performant alternative** (`msf_gif.h`) that operates directly on memory... and actually works very well! Try it out!
+ 
+ - NEW **RenderBatch** system: `rlgl` module has been redesigned to support custom **render batches** to allow grouping draw calls as desired, previous implementation just had one default render batch. This feature has not been exposed to raylib API yet but it can be used by advance users dealing with `rlgl` directly. For example, multiple `RenderBatch` can be created for 2D sprites and 3D geometry independently.
+ 
+ - NEW **Framebuffer** system: `rlgl` module now exposes an API for custom **Framebuffer attachments** (including cubemaps!). raylib `RenderTexture` is a basic use-case, just allowing color and depth textures, but this new API allows the creation of more advance Framebuffers with multiple attachments, like the **G-Buffers**. `GenTexture*()` functions have been redesigned to use this new API.
+ 
+ - Improved **software rendering**: raylib `Image*()` API is intended for software rendering, for those cases when **no GPU or no Window is available**. Those functions operate directly with **multi-format** pixel data on RAM and they have been completely redesigned to be way faster, specially for small resolutions and retro-gaming. Low-end embedded devices like **microcontrollers with custom displays** could benefit of this raylib functionality!
+ 
+ - File **loading from memory**: Multiple functions have been redesigned to load data from memory buffers **instead of directly accessing the files**, now all raylib file loading/saving goes through a couple of functions that load data into memory. This feature allows **custom virtual-file-systems** and it gives more control to the user to access data already loaded in memory (i.e. images, fonts, sounds...).
+ 
+ - NEW **Window states** management system: raylib `core` module has been redesigned to support Window **state check and setup more easily** and also **before/after Window initialization**, `SetConfigFlags()` has been reviewed and `SetWindowState()` has been added to control Window minification, maximization, hidding, focusing, topmost and more.
+ 
+ - NEW **GitHub Actions** CI/CD system: Previous CI implementation has been reviewed and improved a lot to support **multiple build configurations** (platforms, compilers, static/shared build) and also an **automatic deploy system** has been implemented to automatically attach the diferent generated artifacts to every new release. As the system seems to work very good, previous CI platforms (AppVeyor/TravisCI) have been removed.
+ 
+A part of those changes, many new functions have been added, some redundant functions removed and many functions have been reviewed for consistency with the full API (function name, parameters name and order, code formatting...). Again, this release represents is a **great improvement for raylib and marks the way forward** for the library. Make sure to check [CHANGELOG](CHANGELOG) for details! Hope you enjoy it!
+
+Happy holidays! :)
+
+notes on raylib 3.7
+-------------------
+
+April 2021, it's been about 4 months since last raylib release and here it is already a new one, this time with a bunch of internal redesigns and improvements. Surprisingly, on April the 8th I was awarded for a second time with the [Google Open Source Peer Bonus Award](https://opensource.googleblog.com/2021/04/announcing-first-group-of-google-open-source-peer-bonus-winners.html) for my contribution to open source world with raylib and it seems the library is getting some traction, what a better moment for a new release? Let's see what can be found in this new version:
+
+Let's start with some numbers:
+
+ - **+100** closed issues (for a TOTAL of **+900**!)
+ - **+400** commits since previous RELEASE
+ - **+50** functions ADDED (**+30** of them to rlgl API)
+ - **+30** functions REVIEWED/REDESIGNED
+ - **+40** new contributors (for a TOTAL of **+210**!)
+ 
+Highlights for `raylib 3.7`:
+
+ - **REDESIGNED: `rlgl` module for greater abstraction level**. This suppose an **important change in raylib architecture**, now `rlgl` functionality is self-contained in the module and used by higher-level layers (specially by `core` module), those upper layers are the ones that expose functionality to the main API when required, for example the `Shaders`, `Mesh` and `Materials` functionality. Multiple `rlgl` functions have been renamed for consistency, in this case, following the `rl*()` prefix convention. Functions have also been reorganized internally by categories and `GenTexture*()` functions have been removed from the library and moved to [`models_material_pbr`](https://github.com/raysan5/raylib/blob/master/examples/models/models_material_pbr.c) example.
+ 
+ - **REDESIGNED: VR simulator and stereo rendering mechanism**. A **brand new API** has been added, more comprehensive and better integrated with raylib, the **new stereo rendering** can be combined with `RenderTexture` and `Shader` API allowing the user to **manage fbo and distortion shader directly**. Also, the new rendering mechanism supports **instancing on stereo rendering**! Check the updated [`core_vr_simulator`](https://github.com/raysan5/raylib/blob/master/examples/core/core_vr_simulator.c) example for reference!
+ 
+ - **ADDED: New file access callbacks system**. Several new callback functions have been added to the API to allow custom file loaders. A [nice example](https://github.com/RobLoach/raylib-physfs) it's the **raylib integration with a virtual file system** [PhysFS](https://icculus.org/physfs/).
+ 
+ - **ADDED: glTF animations support**. glTF is the preferred models file format to be used with raylib and along the addition of a models animation API on latest raylib versions, now animations support for glTF format has come to raylib, thanks for this great contribution to [Hristo Stamenov](@object71)
+ 
+ - **ADDED: Music streaming support from memory**. raylib has been adding the `Load*FromMemory()` option to all its supported file formats but **music streaming** was not supported yet... until now. Thanks to this great contribution by [Agnis "NeZvērs" Aldiņš](@nezvers), now raylib supports music streamming from memory data for all supported file formats: WAV, OGG, MP3, FLAC, XM and MOD.
+ 
+ - **RENAMED: enums values for consistency**. Most raylib enums names and values names have been renamed for consistency, now all value names start with the type of data they represent. It increases clarity and readability when using those values and also **improves overall library consistency**.
+ 
+Beside those key changes, many functions have been reviewed with improvements and bug fixes, many of them contributed by the community! Thanks! And again, this release sets a **new milestone for raylib library**. Make sure to check [CHANGELOG](CHANGELOG) for detailed list of changes! Hope you enjoy this new raylib installment!
+
+Happy **gamedev/tools/graphics** programming! :)
