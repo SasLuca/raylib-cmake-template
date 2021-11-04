@@ -3,12 +3,14 @@
 #define SCREEN_WIDTH (800)
 #define SCREEN_HEIGHT (450)
 
+#define WINDOW_TITLE "Window title"
+
 int main(void)
 {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Window title");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
     SetTargetFPS(60);
 
-    Texture2D texture = LoadTexture(ASSETS_PATH"test.png");
+    Texture2D texture = LoadTexture(ASSETS_PATH"test.png"); // Check README.md for how this works
 
     while (!WindowShouldClose())
     {
