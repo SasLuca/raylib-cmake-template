@@ -6,16 +6,6 @@ The master branch of the raylib source code is downloaded using CMake FetchConte
 
 Building from the cmake file will build both raylib and `src/main.c` which includes a basic example of a raylib program.
 
-## Q&A
-
-1. How do I change my project name?
-
-    On `line 2` in `CMakeLists.txt` you can change the name `"my_raylib_game"` in the line `project(my_raylib_game C)`. Don't change anything other than the name.
-
-2. How do I use C++?
-
-    One `line 2` in `CMakeLists.txt` you can add `CXX` like so `project(my_raylib_game C CXX)` in order to add C++ support.
-
 ## Asset handling
 
 The example in `src/main.c` uses an example image located in the `assets` folder.
