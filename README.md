@@ -10,7 +10,7 @@ Building from the cmake file will build both raylib and `src/main.c` which inclu
 
 The example in `src/main.c` uses an example image located in the `assets` folder.
 To load it we use `ASSETS_PATH`, which is a string macro with the *absolute* path "assets" directory.
-This macro is defined in the `CMakeLists.txt` file on line `
+This macro is defined in the `CMakeLists.txt` file on line `23`.
  
 If you plan on releasing or sharing your game consider manually setting the value of the `ASSETS_PATH` macro.
 
